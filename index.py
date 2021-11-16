@@ -25,18 +25,8 @@ def handleTcpConnections(conn):
         conn.sendall(result)
     print("connection closed for {}".format(addr))
     conn.close()
-  
-# def handleUdpConnections(data):
-#     while 1:
-#         print("Processing UDP request")
-#         print("udp data: {}".format(data))
-#         if not data: 
-#             break
-#         result = sendRequest(data,host,dnsaddr)
-#         print("results from UDP query: {}".format(result))
-#         #conn.sendall(result)
-#     print("UDP connection closed")
-    conn.close()
+
+
 
 
 # Send Request to CloudFlare
@@ -60,18 +50,15 @@ if __name__ == '__main__':
     sockclient  =  socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sockclient.bind((host,port))
     sockclient.listen(1)
-    # sockudp  =  socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    # sockudp.bind((host,port))
+
     
 
     print("Listening for connections on port {}".format(port))
     while 1:
       try:
-        #   udpdata, udpaddr = sockudp.recvfrom(1024) # Listening on UDP port 53
+
           conn, address = sockclient.accept()       # Listening on TCP port 53
-        #   if udpdata:
-        #       t = Thread(target=handleUdpConnections, args=(udpdata,))
-        #       t.start()
+
           
           if conn:
               t = Thread(target=handleTcpConnections, args=(conn, ))
