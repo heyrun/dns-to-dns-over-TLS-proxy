@@ -1,6 +1,8 @@
 import ssl
 import socket
 from configparser import ConfigParser
+from threading import Thread
+
 host = ''
 port = 53
 
@@ -11,6 +13,20 @@ config.read('conf.ini')
 
 server = config['SERVER']
 dnsaddr = (server['ipaddr'], int(server['port']))
+
+# Handle thread connections 
+def handleTcpConnections(conn):
+    while 1:
+        print("Processing TCP request")
+        data, addr = conn.recvfrom(1024) # Receive request data from remote connection
+        if not data: 
+            break
+        result = sendRequest(data,host,dnsaddr)
+        conn.sendall(result)
+    print("connection closed for {}".format(addr))
+    conn.close()
+
+
 
 
 # Send Request to CloudFlare
@@ -34,18 +50,21 @@ if __name__ == '__main__':
     sockclient  =  socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sockclient.bind((host,port))
     sockclient.listen(1)
-    while 1:
+
     
+
+    print("Listening for connections on port {}".format(port))
+    while 1:
       try:
 
-          conn, address = sockclient.accept()
+          conn, address = sockclient.accept()       # Listening on TCP port 53
+
+          
+          if conn:
+              t = Thread(target=handleTcpConnections, args=(conn, ))
+              t.start()
+
         
-          with conn:
-            print('Local connection established on {}'.format(address))
-            data, addr = conn.recvfrom(1024)
-            result = sendRequest(data,host,dnsaddr)
-            conn.sendall(result)
-            conn.shutdown(1)
-            conn.close()
       except Exception as e: print(e)
+    sockclient.close()
  
