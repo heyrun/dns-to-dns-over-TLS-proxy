@@ -1,4 +1,4 @@
-# N26 SRE Challenge
+
 ## DNS to DNS-over-TLS proxy SRE
 
 Regular DNS requests are sent unencrypted. This means that a potential hacker can see the resources you/your applications are trying to access. This can definitely pose a potential risk to the business. 
